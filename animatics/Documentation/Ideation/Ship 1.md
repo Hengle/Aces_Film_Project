@@ -1,3 +1,0 @@
-![[ShipsSketches.jpg]]
-Ship one
-
