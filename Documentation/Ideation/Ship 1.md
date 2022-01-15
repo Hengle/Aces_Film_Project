@@ -1,0 +1,3 @@
+![[ShipsSketches.jpg]]
+Ship one
+
