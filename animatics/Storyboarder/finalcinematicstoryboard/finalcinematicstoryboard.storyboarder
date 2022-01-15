@@ -1,0 +1,416 @@
+{
+  "version": "3.0.0",
+  "aspectRatio": "1.7777777777777777",
+  "fps": 24,
+  "defaultBoardTiming": 2000,
+  "boards": [
+    {
+      "uid": "VJ793",
+      "url": "board-7-VJ793.png",
+      "newShot": false,
+      "lastEdited": 1633022520834,
+      "layers": {
+        "reference": {
+          "url": "board-7-VJ793-reference.png",
+          "opacity": 1
+        },
+        "ink": {
+          "url": "board-7-VJ793-ink.png"
+        },
+        "shot-generator": {
+          "url": "board-7-VJ793-shot-generator.png",
+          "opacity": 1
+        },
+        "fill": {
+          "url": "board-7-VJ793-fill.png"
+        },
+        "tone": {
+          "url": "board-7-VJ793-tone.png"
+        },
+        "pencil": {
+          "url": "board-7-VJ793-pencil.png"
+        },
+        "notes": {
+          "url": "board-7-VJ793-notes.png"
+        }
+      },
+      "number": 1,
+      "shot": "1A",
+      "time": 0,
+      "lineMileage": 32505.046366941744,
+      "action": "slow pan to show space station",
+      "duration": "1000"
+    },
+    {
+      "uid": "E1G8A",
+      "url": "board-6-E1G8A.png",
+      "newShot": false,
+      "lastEdited": 1638197763924,
+      "layers": {
+        "notes": {
+          "url": "board-6-E1G8A-notes.png"
+        },
+        "reference": {
+          "url": "board-6-E1G8A-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 2,
+      "shot": "2A",
+      "time": 1000,
+      "lineMileage": 24329.800613952655,
+      "action": "show that there is an earth prisoner who is in the hangar looking at a ship",
+      "duration": "800"
+    },
+    {
+      "uid": "062WU",
+      "url": "board-8-062WU.png",
+      "newShot": false,
+      "lastEdited": 1638197995770,
+      "layers": {
+        "notes": {
+          "url": "board-8-062WU-notes.png"
+        },
+        "reference": {
+          "url": "board-8-062WU-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 3,
+      "shot": "3A",
+      "time": 1800,
+      "lineMileage": 12918.701846621278,
+      "action": "? Show energy wall being activated?\nshow the space station move into place and show the scale by showing the hangars",
+      "duration": "1500"
+    },
+    {
+      "uid": "0I6QJ",
+      "url": "board-9-0I6QJ.png",
+      "newShot": false,
+      "lastEdited": 1638198077902,
+      "layers": {
+        "notes": {
+          "url": "board-9-0I6QJ-notes.png"
+        },
+        "reference": {
+          "url": "board-9-0I6QJ-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 4,
+      "shot": "4A",
+      "time": 3300,
+      "lineMileage": 24486.862615823775,
+      "duration": "800"
+    },
+    {
+      "uid": "SOC4W",
+      "url": "board-10-SOC4W.png",
+      "newShot": false,
+      "lastEdited": 1638198237728,
+      "layers": {
+        "notes": {
+          "url": "board-10-SOC4W-notes.png"
+        }
+      },
+      "number": 5,
+      "shot": "5A",
+      "time": 4100,
+      "lineMileage": 14262.929838975531,
+      "duration": "500"
+    },
+    {
+      "uid": "Q6ZP7",
+      "url": "board-12-Q6ZP7.png",
+      "newShot": false,
+      "lastEdited": 1638198318257,
+      "layers": {
+        "notes": {
+          "url": "board-12-Q6ZP7-notes.png"
+        },
+        "reference": {
+          "url": "board-12-Q6ZP7-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 6,
+      "shot": "6A",
+      "time": 4600,
+      "lineMileage": 5684.108516851062,
+      "duration": "500",
+      "action": "show the countdown on the hologram"
+    },
+    {
+      "uid": "23DIV",
+      "url": "board-15-23DIV.png",
+      "newShot": false,
+      "lastEdited": 1638198542605,
+      "layers": {
+        "notes": {
+          "url": "board-15-23DIV-notes.png"
+        },
+        "reference": {
+          "url": "board-15-23DIV-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 7,
+      "shot": "7A",
+      "time": 5100,
+      "lineMileage": 18942.60042053412,
+      "duration": "1200"
+    },
+    {
+      "uid": "Y3GL7",
+      "url": "board-16-Y3GL7.png",
+      "newShot": false,
+      "lastEdited": 1638198598039,
+      "layers": {
+        "notes": {
+          "url": "board-16-Y3GL7-notes.png"
+        },
+        "reference": {
+          "url": "board-16-Y3GL7-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 8,
+      "shot": "8A",
+      "time": 6300,
+      "lineMileage": 5523.020620317235,
+      "duration": "1000",
+      "action": "countdown hits zero"
+    },
+    {
+      "uid": "4U2YB",
+      "url": "board-17-4U2YB.png",
+      "newShot": false,
+      "lastEdited": 1638198626142,
+      "layers": {
+        "notes": {
+          "url": "board-17-4U2YB-notes.png"
+        },
+        "reference": {
+          "url": "board-17-4U2YB-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 9,
+      "shot": "9A",
+      "time": 7300,
+      "lineMileage": 6899.736119033011,
+      "duration": "800",
+      "action": "ship takes off and hovers over hangar bay floor"
+    },
+    {
+      "uid": "GMJ44",
+      "url": "board-18-GMJ44.png",
+      "newShot": false,
+      "lastEdited": 1638198666196,
+      "layers": {
+        "notes": {
+          "url": "board-18-GMJ44-notes.png"
+        },
+        "reference": {
+          "url": "board-18-GMJ44-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 10,
+      "shot": "10A",
+      "time": 8100,
+      "lineMileage": 7292.576303004683,
+      "duration": "200",
+      "action": "ship zooms out of hangar bay"
+    },
+    {
+      "uid": "54XBZ",
+      "url": "board-19-54XBZ.png",
+      "newShot": false,
+      "lastEdited": 1638198723675,
+      "layers": {
+        "notes": {
+          "url": "board-19-54XBZ-notes.png"
+        },
+        "reference": {
+          "url": "board-19-54XBZ-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 11,
+      "shot": "11A",
+      "time": 8300,
+      "lineMileage": 2953.545437735335,
+      "action": "mography words\n-only one pilot...",
+      "duration": "500"
+    },
+    {
+      "uid": "O6AV0",
+      "url": "board-20-O6AV0.png",
+      "newShot": false,
+      "lastEdited": 1638198778450,
+      "layers": {
+        "notes": {
+          "url": "board-20-O6AV0-notes.png"
+        },
+        "reference": {
+          "url": "board-20-O6AV0-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 12,
+      "shot": "12A",
+      "time": 8800,
+      "lineMileage": 11030.711242156325,
+      "duration": "500"
+    },
+    {
+      "uid": "0XWVZ",
+      "url": "board-21-0XWVZ.png",
+      "newShot": false,
+      "lastEdited": 1638198825565,
+      "layers": {
+        "notes": {
+          "url": "board-21-0XWVZ-notes.png"
+        },
+        "reference": {
+          "url": "board-21-0XWVZ-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 13,
+      "shot": "13A",
+      "time": 9300,
+      "lineMileage": 2591.2263976851937,
+      "duration": "200",
+      "action": "more words"
+    },
+    {
+      "uid": "B0X9I",
+      "url": "board-22-B0X9I.png",
+      "newShot": false,
+      "lastEdited": 1638198845832,
+      "layers": {
+        "notes": {
+          "url": "board-22-B0X9I-notes.png"
+        },
+        "reference": {
+          "url": "board-22-B0X9I-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 14,
+      "shot": "14A",
+      "time": 9500,
+      "lineMileage": 7457.050493733397,
+      "duration": "400",
+      "action": "dogfight chase and target ship tumbles and explodes against the shield wall"
+    },
+    {
+      "uid": "4BP5G",
+      "url": "board-23-4BP5G.png",
+      "newShot": false,
+      "lastEdited": 1638198896071,
+      "layers": {
+        "notes": {
+          "url": "board-23-4BP5G-notes.png"
+        },
+        "reference": {
+          "url": "board-23-4BP5G-reference.png",
+          "opacity": 0.75
+        }
+      },
+      "number": 15,
+      "shot": "15A",
+      "time": 9900,
+      "lineMileage": 11650.310125109814,
+      "duration": "200",
+      "dialogue": "",
+      "action": "super planet weapon charges up"
+    },
+    {
+      "uid": "X55WI",
+      "url": "board-24-X55WI.png",
+      "newShot": false,
+      "lastEdited": 1638198929887,
+      "layers": {
+        "notes": {
+          "url": "board-24-X55WI-notes.png"
+        }
+      },
+      "number": 16,
+      "shot": "16A",
+      "time": 10100,
+      "lineMileage": 10002.276407961386,
+      "duration": "200",
+      "action": "planet weapon hits planet"
+    },
+    {
+      "uid": "1NAU5",
+      "url": "board-25-1NAU5.png",
+      "newShot": false,
+      "lastEdited": 1638198965037,
+      "layers": {
+        "notes": {
+          "url": "board-25-1NAU5-notes.png"
+        }
+      },
+      "number": 17,
+      "shot": "17A",
+      "time": 10300,
+      "lineMileage": 2568.067837985435,
+      "duration": "200",
+      "action": "more words"
+    },
+    {
+      "uid": "EWCJ6",
+      "url": "board-26-EWCJ6.png",
+      "newShot": false,
+      "lastEdited": 1638199016251,
+      "layers": {
+        "notes": {
+          "url": "board-26-EWCJ6-notes.png"
+        }
+      },
+      "number": 18,
+      "shot": "18A",
+      "time": 10500,
+      "lineMileage": 10010.939691689337,
+      "duration": "500",
+      "action": "ship zooms around creating a tail and then the spaces aces logo appears with the trail as part of the A."
+    },
+    {
+      "uid": "ZCRHJ",
+      "url": "board-27-ZCRHJ.png",
+      "newShot": false,
+      "lastEdited": 1638199087157,
+      "layers": {
+        "notes": {
+          "url": "board-27-ZCRHJ-notes.png"
+        }
+      },
+      "number": 19,
+      "shot": "19A",
+      "time": 11000,
+      "lineMileage": 1601.1843442631823,
+      "duration": "500",
+      "action": "fade out"
+    },
+    {
+      "uid": "958SV",
+      "url": "board-28-958SV.png",
+      "newShot": false,
+      "lastEdited": 1638199097254,
+      "layers": {
+        "notes": {
+          "url": "board-28-958SV-notes.png"
+        }
+      },
+      "number": 20,
+      "shot": "20A",
+      "time": 11500,
+      "lineMileage": 820.3202781741711,
+      "action": "credits"
+    }
+  ]
+}
