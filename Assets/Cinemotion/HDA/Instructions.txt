@@ -1,0 +1,3 @@
+Copy the HDA to your otls folder in your Houdini documents directory. For more information please read the digital assets section on the sidefx website:
+
+https://www.sidefx.com/docs/houdini/assets/install.html
