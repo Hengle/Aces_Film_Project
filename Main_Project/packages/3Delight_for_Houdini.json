@@ -1,0 +1,1 @@
+{ "env": [ { "DELIGHT":"/home/ben/Applications/3delight-2.6.26/Linux-x86_64" }, { "HOUDINI_PATH":"$DELIGHT/houdini/${HOUDINI_VERSION}" } ] }
