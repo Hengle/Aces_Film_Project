@@ -1,0 +1,14 @@
+Load warnings for /home/ben/dev/Aces_Stuff/Aces_Film_Project/Research and Devlopment/Ben/paneling/paneling.hiplc
+
+Warning:     Problem while synchronizing child node:
+             Warning:     Skipping unrecognized parameter "dosinglepass".
+             Skipping unrecognized parameter "singlepass".
+	[/obj/Prison_Ship/Prison_Ship/SCi_fi_Panel_generator2/sop_trace_psd_file1]
+
+Warning:     Skipping unrecognized parameter "dosinglepass".
+             Skipping unrecognized parameter "singlepass".
+	[/obj/Prison_Ship/Prison_Ship/SCi_fi_Panel_generator2/sop_trace_psd_file2]
+
+Warning:     Skipping unrecognized parameter "orientation_mode".
+	[/obj/Prison_Ship/Prison_Ship/SCi_fi_Panel_generator2/sop_autouv1]
+
