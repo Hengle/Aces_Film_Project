@@ -1,0 +1,73 @@
+#include &lt;stdosl.h&gt;
+
+int has_solutions (vector StartPoint, vector UnitVector, float Radius) {
+    float b = 2 * dot (UnitVector, StartPoint);
+    float bsquared = pow(b,2);
+    float c = dot (StartPoint,StartPoint) - pow(Radius,2);
+    float fourac = 4 * c;
+
+
+    if (bsquared &gt; fourac) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+int linetype (vector StartPoint, vector UnitVector, float Radius) {
+    float b = 2 * dot (UnitVector, StartPoint);
+    float bsquared = pow(b,2);
+    float c = dot (StartPoint,StartPoint) - pow(Radius,2);
+    float fourac = 4 * c;
+
+
+    if (bsquared &gt; fourac) {
+        float d1 = (-b + pow(bsquared - fourac, 0.5)) / 2;
+        float d2 = (-b - pow(bsquared - fourac, 0.5)) / 2;
+        if (d1 &lt; 0 && d2 &lt; 0) {
+            return 2;
+        } else if (d1 &lt; 0 || d2 &lt; 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        return 3;
+    }
+}
+
+
+vector lmin (vector StartPoint, vector UnitVector, float Radius) {
+    float b = 2 * dot (UnitVector, StartPoint);
+    float bsquared = pow(b,2);
+    float c = dot (StartPoint,StartPoint) - pow(Radius,2);
+    float fourac = 4 * c;
+
+
+    if (bsquared &gt; fourac) {
+        float d1 = (-b + pow(bsquared - fourac, 0.5)) / 2;
+        float d2 = (-b - pow(bsquared - fourac, 0.5)) / 2;
+        return StartPoint + UnitVector * min(d1, d2);
+    } else {
+        return vector(0);
+    }
+}
+
+
+vector lmax (vector StartPoint, vector UnitVector, float Radius) {
+    float b = 2 * dot (UnitVector, StartPoint);
+    float bsquared = pow(b,2);
+    float c = dot (StartPoint,StartPoint) - pow(Radius,2);
+    float fourac = 4 * c;
+
+
+    if (bsquared &gt; fourac) {
+        float d1 = (-b + pow(bsquared - fourac, 0.5)) / 2;
+        float d2 = (-b - pow(bsquared - fourac, 0.5)) / 2;
+        return StartPoint + UnitVector * max(d1, d2);
+    } else {
+        return vector(0);
+    }
+}
+

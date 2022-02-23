@@ -1,0 +1,3 @@
+[submodule "Houdini_Personal_Resources"]
+	path = Houdini_Personal_Resources
+	url = git@github.com:benshurts/Houdini_Personal_Resources.git
