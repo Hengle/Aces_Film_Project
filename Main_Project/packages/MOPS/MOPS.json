@@ -1,9 +1,0 @@
-{
-	"env": [
-		{
-			"MOPS": "$HOUDINI_PACKAGE_PATH/../MOPS"
-		}
-	],
-	"path": "$MOPS"
-	
-}

@@ -1,9 +1,0 @@
-{
-	"env": [
-		{
-			"MOPSPLUS": "/home/ben/houdini18.5/packages/MOPS_plus"
-		},
-	],
-	"path": "$MOPSPLUS"
-	
-}

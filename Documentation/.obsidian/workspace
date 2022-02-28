@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Documentation/Standards.md",
+            "file": "Documentation/Deadline Render farm.md",
             "mode": "source",
             "source": false
           }
@@ -49,8 +49,7 @@
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -70,7 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Documentation/Standards.md",
+                "file": "Documentation/Deadline Render farm.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -98,7 +97,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Documentation/Standards.md"
+                "file": "Documentation/Deadline Render farm.md"
               }
             }
           },
@@ -120,15 +119,15 @@
   },
   "active": "2f22ebcdd6c029b8",
   "lastOpenFiles": [
+    "Documentation/Deadline Render farm.md",
+    "Documentation/Tasking.md",
+    "Index.md",
     "Documentation/Standards.md",
     "Documentation/Shots.md",
     "Documentation/Shot Planning.md",
     "Documentation/Rendering.md",
     "Documentation/Pipeline.md",
     "Documentation/Modeling.md",
-    "Attachment/documentation/Houdini Project Structure.svg",
-    "Attachment/documentation/Pipeline-chart.svg",
-    "Attachment/documentation/Project Structure Diagram.svg",
-    "Index.md"
+    "Attachment/documentation/Houdini Project Structure.svg"
   ]
 }
