@@ -24,6 +24,8 @@ It won't be longer than a minute.
 
 [[Tasking]]
 
+[[File Conversion]] -> IMPORTANT if you do NOT own houdini indie
+
 [[Shots]]
 
 [[Shot Planning]]
@@ -41,7 +43,6 @@ It won't be longer than a minute.
 [[Pipeline]]
 
 ---
-
 
 
 - add resources for prepping models for destruction
