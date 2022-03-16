@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+
 import os
 import pathlib
 import time
@@ -15,10 +16,10 @@ import json
 #########################################
 #########################################
 #########################################
-
+from itertools import chain, repeat
 from pathlib import Path, PurePath
 from sys import platform
-from simple_term_menu import TerminalMenu
+#from simple_term_menu import TerminalMenu
 from dotenv import load_dotenv
 
 ##########################################
@@ -41,8 +42,22 @@ from dotenv import load_dotenv
 hou_18_paths = {
     "linux":"/opt/hfs18.5.759",
     "mac":"/Applications/Houdini18.5.759",
-    "windows":"C:\Program Files\Side Effects Software\Houdini 18.5.759"
+    "win":"C:\Program Files\Side Effects Software\Houdini 18.5.759"
     }
+
+#inital setup check
+INITIALIZED=''
+
+#Team member name
+USER: string = ''
+
+#dates
+INIT_DATE=''
+CURRENT_DATE=''
+LAST_OPENED=''
+TIME_OPENED=''
+TIMES_OPENED = []
+DATES_OPENED = []
 
 #houdini terminal
 HOUDINI_TERM = ''
@@ -118,8 +133,36 @@ def add_to_dict_and_arr(k,v):
     add_var_to_dict(k,v)
     add_to_arr(v)
 
+def create_dir_if_not_present(dirpath):
+    pathlib.Path(dirpath).mkdir(parents=True,exist_ok=True)
 
+def create_dirs_from_list(currpath,dirlist):
+    """
+    takes the current path as a path obejct and a list of strings 
+    created the child directories based on the list of strings
+    returns an array of the paths of the newly created child dirs
+    if dirs already exist grap the paths and export them
+    """
+    newpathlist = []
+    for d in dirlist:
+        newdirpath = pathlib.Path(currpath)/d
+        
 
+        create_dir_if_not_present(newdirpath)
+        try:
+            if newdirpath.exists():
+                newpathlist.append(newdirpath)
+        except:
+            print('could not add child dir to list!')
+    return newpathlist
+
+def add_dirlist_to_dict(dirlist,nameprefix):
+    #print(dirlist)
+    for d in dirlist:
+        k = f'{nameprefix}{d.name}'
+        #print(d)
+        #print(k)
+        add_to_dict_and_arr(k,d)
 
 #endregion
 #region SETUP MAIN
@@ -209,9 +252,12 @@ def check_os():
 # enableHouModule()
 # import hou
 #region Houdini Terminal
+
 ###################################################
 ############## Get Houdini Terminal ###############
 ###################################################
+
+# CMD prompt & BASH & CSH
 
 
 
@@ -234,41 +280,7 @@ def source_houdini():
 
 
 # Slurp contents of terminal setup
-def slurp_term():
-    houdini_setup_file = source_houdini()
-    platform = check_os()
-    print(houdini_setup_file)
-    string = ''
-    # Linux
-    if platform == 'linux':
-        file = open(houdini_setup_file, "r")
-        houdini_setup = file.read()
-        file.close()
-        print(houdini_setup)
-        string = []
-        string.append("%s\n\n" % PATH)
-        if redshift == 1:
-            # redshift is available
-            string.append("%s\n" % redshift_LICENSE)
-        string.append("cd %s\n\n" % HVER)
-        string.append(houdini_setup)
-        string.append("\n")
-        string.append('\necho "Sourced %s"\n' % houdini_setup_file)
-        string.append('\necho "hserver -S %s\n"' % HSERVER)
-        string.append("hserver -S %s" % HSERVER)
-        string.append("\n%s\n" % HVARS)
-        string.append("%s\n" % HOUDINI_PATH)
-        string.append("%s\n" % HOUDINI_GALLERY_PATH)
-        string.append("%s\n" % HNO)
-        string.append("%s\n" % HSITE)
-        string.append("%s\n" % HPKG)
-        string.append("%s\n" % SHORTCUTS)
-    # Mac
-    elif platform == 'mac':
-        pass
-    # Windows
-    elif platform == 'win':
-        pass
+
 
 #endregion
 #region Houdini final
@@ -323,8 +335,9 @@ def init_houdini():
 
 ##### HOUDINI MAIN #####
 def houdini_main():
-    slurp_term()
+    #slurp_term()
     # load_from_config()
+    pass
 
 #endregion
 #endregion
@@ -447,19 +460,59 @@ def aces_check():
 #endregion
 #region SHOTS
 
+###########################################
+########### folder dir lists ##############
+###########################################
+global_asset_child_dir_namelist = [
+    'SRC',
+    'GEO',
+    'BLEND',
+    'TEXTURE',
+    'HDA',
+    'OTHER',
+    'PDG'
+]
+global_src_dir_namelist = [
+    'BLENDER',
+    'MAYA',
+    'ZBRUSH',
+    'SUBSTANCE',
+    'OTHER'
+]
+global_geo_dir_namelist = [
+    'FBX',
+    'OBJ',
+    'HOUDINI',
+    'CACHE',
+    'OTHER'
+]
+global_tex_dir_namelist = [
+    'HDRI',
+    'IMPERFECTIONS',
+    'PBR',
+    'DATASETTEX',
+    'DECALS',
+    'SUBSTANCE',
+    'OTHER'
+]
+
+
 ############################################
 ################ Shot Prep #################
 ############################################
 
 shot_subdir_names = [
     "GEO",
+    "SRC",
     "HIP",
     "RENDER",
     "TEXTURE",
     "BLEND",
     "ASSETS",
-    "HDA"
+    "HDA",
+    "PDG"
 ]
+
 
 shots_list = []
 
@@ -501,13 +554,13 @@ def create_shot():
         Path.mkdir(shot_n)
         shots_list.append(shot_n)
         #create resources for the new shot directory
-        create_resource_subdirs(shot_n)
+        create_resource_subdirs(shot_n,shot_subdir_names)
 
 
-def create_resource_subdirs(curr_path):
+def create_resource_subdirs(curr_path,dirlist):
     #create all conventional subdirs for a given (sub)directory
-    for item in shot_subdir_names:
-        resource_path = Path.joinpath(curr_path,Path(f"{item}"))
+    for item in dirlist:
+        resource_path = Path(curr_path,Path)/f"{item}"
         if not Path.is_dir(resource_path):
             os.mkdir(resource_path)
 
@@ -519,72 +572,93 @@ def create_resource_subdirs(curr_path):
 ### choose one folder to open
 
 def shot_decision():
-    shots_dir = Path("./Main_Project/shots")
-    shot_dir2 = os.path.join(os.getcwd(),"Main_Project/shots")
-    #dirslist = glob.glob("%s/*/" % SHOTS_ROOT)
-    #shots_list = os.listdir(path=shot_dir2)
-    #shots_list = []
-    menu_dict = {}
-    for x in shots_dir.iterdir():
-        shots_list.append(x)
-        #print(x.name())
-        menu_dict[x.name] = x
-    #print(menu_dict,shots_list)
-    user_choice = input(
-        "Do you want to create a new shot folder? y/n: ").lower()
-    if user_choice == 'y':
-        create_shot()
-        open_shot_folder(shots_dir,shots_list)
-    if user_choice == 'n':
-        open_shot_folder(shots_dir,shots_list)
+    pass
+    
 
-def open_shot_folder(shots_dir,shot_list):
-    user_choice = input(
-        "Do you want to choose a shot to open? y/n: ").lower()
-    if user_choice == 'y':
-        choice = shots_term_menu(shot_list)
-        #print(choice)
-        #print(menu_dict)
 
-        # get path from menu choice with dictionary
-        choice_path = pathlib.Path(shots_dir)/choice
-        SHOT = choice_path
-        add_to_dict_and_arr("SHOT",choice_path)
-        #print(choice_path)
-        shot_resources = get_resource_paths(choice_path)
-        #print(shot_resources)
-        # convert to path object
-        for i in range(len(shot_resources)):
+def count_subdirs(rootdir):
+    total = ''
+    subdirlist = []
+    total = len(os.walk(rootdir).next()[1])
+    print(total)
 
-            pathobj = pathlib.Path(Path.cwd())/shot_resources[i]
-            #print(pathobj)
-            shot_resources[i] = pathobj
-        #print(shot_resources)
-        #print(get_resource_paths(choice_path))
-        shot_res_paths = get_resource_paths(choice_path)
-        for x in shot_res_paths:
-            k_path = pathlib.Path(x)
-            k = k_path.name
-            env_dict[k]=x
-    if user_choice == 'n':
-        sys.exit()
+testdir = pathlib.Path(Path.cwd()) / 'Main_Project/shots/shot_1'
+print(testdir)
+#count_subdirs(testdir)
 
-def shots_term_menu(list):
-    #to string
-    shots_str = []
-    for x in list:
-        shots_str.append(x.name)
-    #print(shots_str)
 
-    options = shots_str
-    term_menu = TerminalMenu(options)
-    menu_entry_index = term_menu.show()
-    print(f"You have selected {options[menu_entry_index]}")
-    return options[menu_entry_index]
+def shot_print():
+    pass
+
+
+
+# def shot_decision():
+#     shots_dir = Path("./Main_Project/shots")
+#     shot_dir2 = os.path.join(os.getcwd(),"Main_Project/shots")
+#     #dirslist = glob.glob("%s/*/" % SHOTS_ROOT)
+#     #shots_list = os.listdir(path=shot_dir2)
+#     #shots_list = []
+#     menu_dict = {}
+#     for x in shots_dir.iterdir():
+#         shots_list.append(x)
+#         #print(x.name())
+#         menu_dict[x.name] = x
+#     #print(menu_dict,shots_list)
+#     user_choice = input(
+#         "Do you want to create a new shot folder? y/n: ").lower()
+#     if user_choice == 'y':
+#         create_shot()
+#         open_shot_folder(shots_dir,shots_list)
+#     if user_choice == 'n':
+#         open_shot_folder(shots_dir,shots_list)
+
+# def open_shot_folder(shots_dir,shot_list):
+#     user_choice = input(
+#         "Do you want to choose a shot to open? y/n: ").lower()
+#     if user_choice == 'y':
+#         choice = shots_term_menu(shot_list)
+#         #print(choice)
+#         #print(menu_dict)
+
+#         # get path from menu choice with dictionary
+#         choice_path = pathlib.Path(shots_dir)/choice
+#         SHOT = choice_path
+#         add_to_dict_and_arr("SHOT",choice_path)
+#         #print(choice_path)
+#         shot_resources = get_resource_paths(choice_path)
+#         #print(shot_resources)
+#         # convert to path object
+#         for i in range(len(shot_resources)):
+
+#             pathobj = pathlib.Path(Path.cwd())/shot_resources[i]
+#             #print(pathobj)
+#             shot_resources[i] = pathobj
+#         #print(shot_resources)
+#         #print(get_resource_paths(choice_path))
+#         shot_res_paths = get_resource_paths(choice_path)
+#         for x in shot_res_paths:
+#             k_path = pathlib.Path(x)
+#             k = k_path.name
+#             env_dict[k]=x
+#     if user_choice == 'n':
+#         sys.exit()
+
+# def shots_term_menu(list):
+#     #to string
+#     shots_str = []
+#     for x in list:
+#         shots_str.append(x.name)
+#     #print(shots_str)
+
+#     options = shots_str
+#     term_menu = TerminalMenu(options)
+#     menu_entry_index = term_menu.show()
+#     print(f"You have selected {options[menu_entry_index]}")
+#     return options[menu_entry_index]
 
 def get_resource_paths(curr_path):
     resource_paths = [i[0] for i in os.walk(
-        curr_path) if os.path.basename(str(i[0])) in shot_subdir_names]
+        curr_path) if pathlib.Path.name(str(i[0])) in shot_subdir_names]
     return resource_paths
 
 #get_initial_paths()
@@ -596,9 +670,40 @@ def get_resource_paths(curr_path):
 #endregion
 #region path setup
 
+def user_question(prompt):
+    answers = {"y","n"}
+    prompts = chain([prompt], repeat("Please answer with y/n: "))
+    replies = map(input, prompts)
+    valid_response = next(filter(answers.__contains__, replies))
+    print(valid_response)
+    return valid_response
+
+
+def user_info():
+    user_choice = input(
+        'Please enter your name. '
+    ).lower()
+    user_confirm = input(
+        f'Is {user_choice} correct? y/n: '
+    ).lower()
+    if user_confirm == 'y':
+        return user_choice
+    elif user_confirm == 'n':
+        user_info()
+
+
+def user_init():
+    namelist = []
+    user = user_info()
+    add_to_dict_and_arr('USER',user)
+
+
 def get_initial_paths():
     # config stuff
     CONFIG = create_config_dir()
+
+    # User stuff
+    user_init()
 
     # houdini term
     HOUDINI_TERM = source_houdini()
@@ -622,18 +727,34 @@ def get_initial_paths():
     # Repo Root
     add_to_dict_and_arr("REPO_ROOT",REPO_ROOT)
     # Project Root
+    create_dir_if_not_present(pathlib.Path(REPO_ROOT,"Main_Project"))
     PROJECT_ROOT = pathlib.Path(REPO_ROOT,"Main_Project")
     add_to_dict_and_arr("PROJECT_ROOT",PROJECT_ROOT)
     # Global Assets Root
+    create_dir_if_not_present(pathlib.Path(PROJECT_ROOT,"assets"))
     ASSETS_GLOBAL_ROOT = pathlib.Path(PROJECT_ROOT,"assets")
     add_to_dict_and_arr("ASSETS_GLOBAL_ROOT",ASSETS_GLOBAL_ROOT)
     ########## GLOB CHILD DIRS #############
-    globalAssetDirList = subdirList(ASSETS_GLOBAL_ROOT)
-    initDirList(globalAssetDirList)
 
-    # Global HDA
-    HDA_GLOBAL = pathlib.Path(PROJECT_ROOT,"HDA")
-    add_to_dict_and_arr("HDA_GLOBAL",HDA_GLOBAL)
+
+    global_asset_child_dir_list = create_dirs_from_list(ASSETS_GLOBAL_ROOT,global_asset_child_dir_namelist)
+    #print(global_asset_child_dir_list)
+    add_dirlist_to_dict(global_asset_child_dir_list,"G_")
+    #print(env_dict)
+
+
+    srcrootpath = pathlib.Path(ASSETS_GLOBAL_ROOT)/'SRC'
+    global_src_dir_list = create_dirs_from_list(srcrootpath,global_src_dir_namelist)
+    add_dirlist_to_dict(global_src_dir_list,'G_SRC_')
+
+    georootpath = pathlib.Path(ASSETS_GLOBAL_ROOT)/'GEO'
+    global_geo_dir_list = create_dirs_from_list(georootpath,global_geo_dir_namelist)
+    add_dirlist_to_dict(global_geo_dir_list,'G_GEO_')
+
+
+    texrootpath = pathlib.Path(ASSETS_GLOBAL_ROOT)/'TEXTURE'
+    global_tex_dir_list = create_dirs_from_list(texrootpath,global_tex_dir_namelist)
+    add_dirlist_to_dict(global_tex_dir_list,'G_TEX_')
 
     # PACKAGES
     PACKAGES = pathlib.Path(PROJECT_ROOT,"PACKAGES")
@@ -645,6 +766,8 @@ def get_initial_paths():
     
 
     #createShotDir(SHOTS_ROOT)
+
+    add_to_dict_and_arr('INITIALIZED','TRUE')
 #endregion
 
 
