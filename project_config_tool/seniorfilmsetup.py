@@ -1064,10 +1064,9 @@ def user_choose_shot(list):
                                 inner_confirm = False
                             else:
                                 print('Invalid response, try again...')
-                                continue                            
+                                raise ValueError                          
                         else:
-                            print('Invalid response, try again...')
-                            continue
+                            raise ValueError
                     except ValueError:
                         print('Invalid response, try again...')
                         continue
@@ -1096,60 +1095,86 @@ def shot_decision():
     shot_choice_path = ''
     shot_root = ''
     shot_choice = ''
+    User_not_confirm = True
+    while User_not_confirm:
+        try:
+            user_choice = int(input(
+                '1 - Create a new shot \n2 - Open existing shot \n'
+            ).lower())
+            
+            # Case 1 
+            if user_choice == 1:
+                #TODO add support for continuing to make shots
+                #TODO support for shot naming?
+                print('creating new shot....')
 
-    user_choice = input(
-        '1 - Create a new shot \n2 - Open existing shot \n'
-    ).lower()
-    # Case 1 
-    if user_choice == '1':
-        #TODO add support for continuing to make shots
-        #TODO support for shot naming?
-        print('creating new shot....')
-
-        shot_folders = create_shot()
-        shotlist = subdir_list(shots_root)
-        shot_choice = choose_shot(shotlist)
-        if (shot_choice[1] == False):
-            choose_shot()
-        print(f'shot choice:: {shot_choice[0]} ---')
-        shot_choice_path = shotlist[shot_choice[0]-1]
-        open_shot(shot_choice_path)
-        # select shot
-        # then houdini stuff
-    # case 2
-    elif user_choice == '2':
-        '''
-        if no shot exists create it
-        since there would only be one select that folder
-        then go to houdini stuff
-        '''
-        print('please choose which shot to open...')
-        if no_subdirs(shots_root):
-            print('No shots exist! Creating shot_1 first...')
-            shot_folders = create_shot()
-            print('Choosing newly created shot_1...')
-            p = Path(shots_root)/'shot_1'
-            #print(p)
-            open_shot(p)
-        else:
-            shotlist = subdir_list(shots_root)
-            shot_choice = choose_shot(shotlist)
-            if (shot_choice[1] == False):
-                choose_shot()
-
-            print(f'shot choice:: {shot_choice[0]} ---')
-            shot_choice_path = shotlist[shot_choice[0]-1]
-            open_shot(shot_choice_path)
-    else:
-        print('please type 1 or 2 and hit enter....')
-        shot_decision()
+                shot_folders = create_shot()
+                shotlist = subdir_list(shots_root)
+                while True:
+                    try:
+                        shot_choice = choose_shot(shotlist)
+                        if (shot_choice[1] == False):
+                            continue
+                        elif (shot_choice[1] == True):
+                            print(f'shot choice:: {shot_choice[0]} ---')
+                            shot_choice_path = shotlist[shot_choice[0]-1]
+                            User_not_confirm = False
+                            break
+                        else:
+                            raise ValueError
+                    except ValueError:
+                        continue
+                    # select shot
+                    # then houdini stuff
+            # case 2
+            elif user_choice == 2:
+                '''
+                if no shot exists create it
+                since there would only be one select that folder
+                then go to houdini stuff
+                '''
+                print('please choose which shot to open...')
+                if no_subdirs(shots_root):
+                    print('No shots exist! Creating shot_1 first...')
+                    shot_folders = create_shot()
+                    print('Choosing newly created shot_1...')
+                    p = Path(shots_root)/'shot_1'
+                    shot_choice_path = p
+                    break
+                    #print(p)
+                    #open_shot(p)
+                else:
+                    shotlist = subdir_list(shots_root)
+                    while True:
+                        try:
+                            shot_choice = choose_shot(shotlist)
+                            if (shot_choice[1] == False):
+                                print(shot_choice[1])
+                                
+                                continue
+                            elif (shot_choice[1] == True):
+                                print(f'shot choice:: {shot_choice[0]} ')
+                                shot_choice_path = shotlist[shot_choice[0]-1]
+                                User_not_confirm = False
+                                break
+                                #open_shot(shot_choice_path)
+                            else:
+                                raise ValueError
+                        except ValueError:
+                            continue
+            else:
+                raise ValueError
+        except ValueError:
+            print('Please enter the numbers 1 or 2...')
+            continue
+    open_shot(shot_choice_path)
 
 def open_shot(path):
     '''
     after user has confirmed shot folder do this...
     '''
     subdirlist = []
-
+    print(path)
     subdir_list = get_resource_paths(path)
     for i in subdir_list:
         print(f'+------------------Registering directory {i.name} in {path.name} directory for your session...')
