@@ -15,7 +15,7 @@ import sys
 import json
 import yaml
 import re
-
+import logging
 #########################################
 #########################################
 #########################################
@@ -111,7 +111,6 @@ TEXTURE = ''
 #endregion
 #region HELPER METHODS
 #region Directory Setup helper methods
-
 ###############################
 ####### DIRECTORY PATHS #######
 ###############################
@@ -150,10 +149,10 @@ def add_dirlist_to_return_dict(list):
 def create_dir_if_not_present(dirpath):
 
     if not dirpath.exists():
-        print(f'Creating new {dirpath.name} Directory in {dirpath.parent}...')
+        print(f'+D/..........................Creating new {dirpath.name} Directory in {dirpath.parent}...')
         pathlib.Path(dirpath).mkdir(parents=True,exist_ok=True)
     else:
-        print(f'Directory {dirpath.name} in {dirpath.parent} exists! Skipping...')
+        print(f'!!!--------------Directory {dirpath.name} in {dirpath.parent} exists! Skipping...')
 
     
 
@@ -200,7 +199,7 @@ def add_readme_file_to_dir(path):
     # if gitfile.exists():
     #     print('git file exists')
     #     gitfile.unlink()
-    print(f'creating README file in {path.name}...')
+    print(f'+f/...................................................................creating README file in {path.name}...')
     fp = pathlib.Path(path)/'README.md'
     fp.open("w",encoding="utf-8")
 
@@ -553,7 +552,7 @@ def aces_check():
 
 #endregion
 #endregion
-#region SHOTS
+
 #region Directory Definitions
 
 ###########################################
@@ -762,6 +761,7 @@ def register_nested_folders(dirlist,prefix,env=False):
 #endregion
 ###########
 #endregion
+#region SHOTS
 #region shot subdir definition
 
 #TODO change this to json
@@ -912,7 +912,7 @@ def create_shot_subfolders(rootdir):
         for k, v in subsubresdict.items():
             if d.name == k:
                 curr_dir = specresdict[k]
-                print(f'creating subresource folders in {k}...')
+                print(f'++D.......creating subresource folders in {k}...')
                 subsubdirlist = create_dirs_from_list(specresdict[k],v)
                 add_readme_file_to_dir(specresdict[k])
                 add_files_to_empty_folders(subsubdirlist)
@@ -971,14 +971,30 @@ def create_shot_subfolders(rootdir):
 
 #endregion
 #region Open Shot
+#region open shot helpers
+def get_resource_paths(curr_path):
+    path = curr_path
+    path_list = []
+    for p in Path(path).iterdir():
+        if(p.is_dir()==True):
+            #print(f'creating {p.name} directory...')
+            path_list.append(p)
+        else:
+            #print('file')
+            continue
+    #print(path_list)
+    return path_list
 
-def shot_env_var_init(shot_root):
-    add_readme_file_to_dir(shot_root)
-    shot_resource_list = get_resource_paths(shot_root)
-    
-    shot_dict = add_dirlist_to_return_dict(shot_resource_list)
-    #print(f'Shot dict:::: {shot_dict}')
+def check_if_num_in_list(num,list) -> bool:
+    result = False
+    total = len(list)
+    if (num > 0) and (num < len(list)+1):
+        result = True
+    else:
+        result = False
+    return result
 
+#endregion
 
 def subdir_list(path):
 
@@ -999,36 +1015,21 @@ def subdir_list(path):
             sorted_shots.append(np)
     return sorted_shots
 
-def check_if_num_in_list(num,list) -> bool:
-    result = False
-    total = len(list)
-    if (num > 0) and (num < len(list)+1):
-        result = True
-    else:
-        result = False
-    return result
 
-def open_shot():
-    
-    #case 1 - creating first shot directory
-    shot_root = Path(PROJECT_ROOT)/"Main_Project/Shots"
-    if not any(Path(shot_root).iterdir()):
-        first_shot_n = Path(shot_root)/"shot_1"
-        if not Path.is_dir(first_shot_n):
-            Path.mkdir(first_shot_n)
-            create_dirs_from_list(first_shot_n)
-            print(f"\'{first_shot_n}\' created along with resource dirs.")
-    #case 2 - select shot
-    #count_subdirs(shot_root)
+
 
 def choose_shot(pathlist):
+    '''
+    displays number of choices user and input
+    '''
     choices = []
     choice = ''
     for i in range(len(pathlist)):
         print(f'{i+1} = {pathlist[i].name}')
         choices.append(i+1)
     print(f'Choices:: {choices}')
-    user_choose_shot(choices)
+    choice = user_choose_shot(choices)
+    return choice
 
 def user_choose_shot(list):
     '''
@@ -1070,7 +1071,6 @@ def user_choose_shot(list):
                     except ValueError:
                         print('Invalid response, try again...')
                         continue
-                print(f'you said {confirm}')
                 if(confirm == True):
                     break
                 elif(confirm == False):
@@ -1084,6 +1084,7 @@ def user_choose_shot(list):
     return choice, confirm
 
 def shot_decision():
+    #TODO refactor into while lop with try except
     '''
     Asks user if they want to create a new shot or open an existing shot
     if they want to open an existing shot and no shot exists it is created and automatically opened
@@ -1092,54 +1093,88 @@ def shot_decision():
     '''
     shots_root = pathlib.Path(pathlib.Path.cwd())/'Main_Project/Shots'
     shot_root_empty = no_subdirs(shots_root)
+    shot_choice_path = ''
     shot_root = ''
+    shot_choice = ''
+
     user_choice = input(
         '1 - Create a new shot \n2 - Open existing shot \n'
     ).lower()
     # Case 1 
     if user_choice == '1':
+        #TODO add support for continuing to make shots
+        #TODO support for shot naming?
         print('creating new shot....')
 
         shot_folders = create_shot()
         shotlist = subdir_list(shots_root)
-        choose_shot(shotlist)
+        shot_choice = choose_shot(shotlist)
+        if (shot_choice[1] == False):
+            choose_shot()
+        print(f'shot choice:: {shot_choice[0]} ---')
+        shot_choice_path = shotlist[shot_choice[0]-1]
+        open_shot(shot_choice_path)
         # select shot
         # then houdini stuff
     # case 2
     elif user_choice == '2':
+        '''
+        if no shot exists create it
+        since there would only be one select that folder
+        then go to houdini stuff
+        '''
         print('please choose which shot to open...')
         if no_subdirs(shots_root):
             print('No shots exist! Creating shot_1 first...')
             shot_folders = create_shot()
-            print()
+            print('Choosing newly created shot_1...')
+            p = Path(shots_root)/'shot_1'
+            #print(p)
+            open_shot(p)
         else:
             shotlist = subdir_list(shots_root)
-            choose_shot(shotlist)
+            shot_choice = choose_shot(shotlist)
+            if (shot_choice[1] == False):
+                choose_shot()
 
-        # if no shot exists create it
-        # since there would only be one select that folder
-        # then go to houdini stuff
+            print(f'shot choice:: {shot_choice[0]} ---')
+            shot_choice_path = shotlist[shot_choice[0]-1]
+            open_shot(shot_choice_path)
     else:
         print('please type 1 or 2 and hit enter....')
         shot_decision()
 
+def open_shot(path):
+    '''
+    after user has confirmed shot folder do this...
+    '''
+    subdirlist = []
+
+    subdir_list = get_resource_paths(path)
+    for i in subdir_list:
+        print(f'+------------------Registering directory {i.name} in {path.name} directory for your session...')
+    print(f'!!! ----- Here is a reminder of the subdirectories in your resources folder ----- !!!')
+    for i in subdir_list:
+        
+        sublist = []
+        for k in i.iterdir():
+            if k.is_dir():
+                print(f'{k.name}')
+                sublist.append(k)
+
+    # for p in Path(path).iterdir():
+    #     if p.is_dir():
+
+    #print(subdirlist)
+
+def shot_env_var_init(shot_root):
+    add_readme_file_to_dir(shot_root)
+    shot_resource_list = get_resource_paths(shot_root)
+    
+    shot_dict = add_dirlist_to_return_dict(shot_resource_list)
+    #print(f'Shot dict:::: {shot_dict}')
 
 
-
-
-
-def get_resource_paths(curr_path):
-    path = curr_path
-    path_list = []
-    for p in Path(path).iterdir():
-        if(p.is_dir()==True):
-            #print(f'creating {p.name} directory...')
-            path_list.append(p)
-        else:
-            #print('file')
-            continue
-    #print(path_list)
-    return path_list
 
     # resource_paths = [i[0] for i in os.walk(
     #     curr_path) if pathlib.Path.name(str(i[0])) in shot_subdir_names]
@@ -1309,6 +1344,16 @@ def get_initial_paths():
     # config stuff
     CONFIG = create_config_dir()
 
+    #region logging setup
+    #TODO implement log file
+    # logfile = pathlib.Path(CONFIG)/'std.log'
+    # logging.basicConfig(str(logfile),format='%(asctime)s %(message)s', filemode='w')
+    # logger=logging.getLogger()
+    # logger.setLevel(logging.DEBUG)
+    # logger.debug('test log')
+    
+    #region
+
     # TODO: research and development init
 
     # houdini term
@@ -1420,15 +1465,13 @@ def get_initial_paths():
 def main():
     indie_check()
     get_initial_paths()
-    #print(CONFIG)
+
     # Shot stuff
     shot_decision()
     #houdini setup
     create_config_files()
     houdini_main()
-    # print(str(env_dict))
-    #pprint.pprint(env_dict)
-    # pprint.pprint(path_list)
+
 
 if __name__ == "__main__":
     main()
