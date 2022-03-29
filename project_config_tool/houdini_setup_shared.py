@@ -35,7 +35,7 @@ key_list = [
 def env_from_file(path):
     #env_file = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'
     dict_var = dotenv_values(path)
-    print(dict_var)
+    #print(dict_var)
     return dict_var
 
 def seek_keys(d, key_list):

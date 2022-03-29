@@ -53,7 +53,7 @@ def main():
         file_path = str(new_dict['HIP']+'/'+new_dict['FILE_TO_OPEN'])
         cmd = cmd+str('&& houdini '+file_path)
     else:
-        cmd = cmd+str(' && hconfig')
+        cmd = cmd+str(' && hconfig && houdini')
     os.system(cmd)
 
 

@@ -1,0 +1,12 @@
+{
+	"env": [
+		{
+			"MOPSPLUS": "C:/Users/Henry/Projects/VFX/MOPS_Plus"
+		},
+		{
+			"HOUDINI_PYTHONWARNINGS": "ignore"
+		},
+	],
+	"path": "$MOPSPLUS"
+	
+}

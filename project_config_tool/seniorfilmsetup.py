@@ -20,6 +20,7 @@ import yaml
 import re
 import logging
 import shlex
+import argparse
 
 #########################################
 #########################################
@@ -1782,13 +1783,20 @@ def parse_dotenv(dotenv_path):
             # Remove any leading and trailing spaces in key, value 
             k, v = k.strip(), v.strip().encode('unicode-escape').decode('ascii') 
 
-            if len(v) > 0: 
+            if len(v) > 0:
                 quoted = v[0] == v[len(v) - 1] in ['"', "'"] 
 
                 if quoted: 
                     v = decode_escaped(v[1:-1]) 
 
             yield k, v
+
+def env_from_file(path):
+    #env_file = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'
+    dict_var = dotenv_values(path)
+    #print(dict_var)
+    return dict_var
+
 
 def check_init(env_path) -> bool:
     
@@ -1803,48 +1811,149 @@ def check_init(env_path) -> bool:
         result = False
     return result
 
+# def unpack(data):
+#     for k, v in data.items():
+#         if isinstance(v, dict):
+#             yield from unpack(v)
+#         else:
+#             yield v
+
+# def depth(it, count=0):
+#     """Depth of a nested dict.
+#     # Arguments
+#         it: a nested dict or list.
+#         count: a constant value used in internal calculations.
+#     # Returns
+#         Numeric value.
+#     """
+#     if isinstance(it, list):
+#         if any(isinstance(v, list) or isinstance(v, dict) for v in it):
+#             for v in it:
+#                 if isinstance(v, list) or isinstance(v, dict):
+#                     return depth(v, count + 1)
+#         else:
+#             return count
+#     elif isinstance(it, dict):
+#         if any(isinstance(v, list) or isinstance(v, dict) for v in it.values()):
+#             for v in it.values():
+#                 if isinstance(v, list) or isinstance(v, dict):
+#                     return depth(v, count + 1)
+#         else:
+#             return count
+#     else:
+#         return count
+
+def unpack_dotenv(env_d):
+    import flatdict
+    result = flatdict.FlatDict(env_d,delimiter=':')
+    return result
+
+
+
+# create parser
+parser = argparse.ArgumentParser()
+
+# add args to parser
+parser.add_argument('init', nargs='?')
+
+
+# parse the args
+args = parser.parse_args()
+
+
+
 def main():
     env_path = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'
     # CLI stuff
     switches = [i for i in sys.argv if re.match(r'^-[A-Za-z]+$',i)]
     args_kwargs = [i for i in sys.argv if not re.match(r'^-[A-Za-z]+$', i)]
     cli_check(switches,args_kwargs)
-
-    if not (check_init(env_path)):
-
+    
+    # get the arguments value
+    if args.init == 'init':
+        print('Forcing Initialization')
         # 3rd party software
         indie_check()
         redshift_main()
-
         # initialize
         get_initial_paths()
-
         # Shot stuff
         shot_decision()
-
         #houdini setup
         houdini_file_main()
-
+        # config files
+        create_config_files()
+        # open houdini
+        houdini_main()
+    elif args.init == 'init-only':
+        print('Forcing Initialization, not opening Houdini...')
+        # 3rd party software
+        indie_check()
+        redshift_main()
+        # initialize
+        get_initial_paths()
+        # Shot stuff
+        shot_decision()
+        #houdini setup
+        houdini_file_main()
         # config files
         create_config_files()
 
-        # open houdini
-        houdini_main()
-
-    else:
+    elif args.init == 'load-last':
+        print('Loading last opened file')
+        env_vars = env_from_file(env_path)
+        #result = [list(unpack(x)) for x in env_vars]
+        #result = depth(env_vars,1)
+        #TODO use flatdict in houdini setup
+        result = dict(unpack_dotenv(env_vars))
+        env_dict = result
         
-
-        # Shot stuff
-        shot_decision()
-
-        #houdini setup
-        houdini_file_main()
-
-        # config files
-        create_config_files()
-
-        # open houdini
+        pprint(result)
         houdini_main()
+    elif args.init == 'man':
+        
+        from rich.console import Console
+        from rich.markdown import Markdown
+        # print('man page')
+        f = pathlib.Path(pathlib.Path.cwd())/'project_config_tool/man.md'
+        md = Markdown(str(f))
+        with open(str(f), "r+") as help_file:
+            #Console.print(help_file,soft_wrap=True)
+            contents = help_file.read()
+            print(contents)
+            # Console.push_render_hook(Console,RENDER)
+            # Console.print(contents,soft_wrap=True)
+            # Console.pop_render_hook()
+        help_file.close()
+        quit()
+    else:
+
+        if not (check_init(env_path)):
+
+            # 3rd party software
+            indie_check()
+            redshift_main()
+            # initialize
+            get_initial_paths()
+            # Shot stuff
+            shot_decision()
+            #houdini setup
+            houdini_file_main()
+            # config files
+            create_config_files()
+            # open houdini
+            houdini_main()
+
+        else:
+            
+            # Shot stuff
+            shot_decision()
+            #houdini setup
+            houdini_file_main()
+            # config files
+            create_config_files()
+            # open houdini
+            houdini_main()
 
 
 if __name__ == "__main__":

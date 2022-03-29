@@ -1,0 +1,10 @@
+{
+	"env": [
+        {
+			"AELIB": "$HOUDINI_PACKAGE_DIR/Aelib"
+        }
+	],
+	"path": [
+        "$AELIB"
+    ]
+}

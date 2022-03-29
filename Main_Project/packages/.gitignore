@@ -1,1 +1,2 @@
-*.json
+/qLib_package_linux.json
+/qLib_package_windows.json

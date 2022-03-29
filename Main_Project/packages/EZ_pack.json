@@ -1,0 +1,8 @@
+{
+    "env": [
+        {
+            "EZ_PACK":"$HOUDINI_PACKAGE_DIR/EZ_pack"
+        }
+    ],
+    "path":"$EZ_PACK"
+}

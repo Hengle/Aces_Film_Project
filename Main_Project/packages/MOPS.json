@@ -1,0 +1,12 @@
+{
+	"env": [
+		{
+			"MOPS": "$HOUDINI_PACKAGE_DIR/MOPS"
+		},
+		{
+			"HOUDINI_PYTHONWARNINGS": "ignore"
+		},
+	],
+	"path": "$MOPS"
+	
+}

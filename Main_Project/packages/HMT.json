@@ -1,0 +1,9 @@
+{
+	"env": [
+		{
+			"HMT": "$HOUDINI_PACKAGE_DIR/HMT"
+		},
+	],
+	"path": "$HMT"
+	
+}

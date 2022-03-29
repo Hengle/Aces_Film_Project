@@ -1,0 +1,6 @@
+{
+	"env":[
+		{"dmnk" : "$HOUDINI_PACKAGE_DIR/DMNK-Tools"},
+		{"HOUDINI_PATH" : "$dmnk"},
+	]
+}
