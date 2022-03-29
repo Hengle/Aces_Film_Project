@@ -1,6 +1,8 @@
 #!/usr/bin/python3
+
 #region HEADER
 
+import contextlib
 from importlib.resources import path
 #from lzma import _PathOrFile
 from operator import add
@@ -13,18 +15,21 @@ import fnmatch
 import glob
 import sys
 import json
+import dotenv
 import yaml
 import re
 import logging
-#########################################
-#########################################
-#########################################
+import shlex
 
+#########################################
+#########################################
+#########################################
+from pprint import pprint
 from itertools import chain, repeat
 from pathlib import Path, PurePath
-from sys import platform
+from sys import platform, stderr, stdout
 #from simple_term_menu import TerminalMenu
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 
 ##########################################
 ##########################################
@@ -233,18 +238,21 @@ def check_os():
         # linux
         print("Congrats! You are on linux!")
         platform = "linux"
+        add_var_to_dict('OS','linux')
         #return
         pass
     elif platform == "darwin":
         # OS X
         print("You are on OSX")
         platform = "mac"
+        add_var_to_dict('OS','mac')
         #return
         pass
     elif platform == "win32":
         # Windows...
         print("You are, unfortunately on Windows...")
         platform = "win"
+        add_var_to_dict('OS','win')
         #return
         pass
     else:
@@ -306,98 +314,6 @@ def y_n_q(q) -> bool:
 
 #endregion
 #endregion
-#region HOUDINI 
-##############################
-####### Houdini Stuff ########
-##############################
-#region HOUDINI setup
-
-
-
-def indie_check():
-    '''Check if user has the correct houdini installed'''
-    if y_n_q("Do you have houdini indie?"):
-        print('Great!')
-    else:
-        print("You will need to convert your hdas and project files to indie using you're project leads account on orbolt before you push changes!")
-        print("please check the docs for link to the converter!")
-    if y_n_q("Do you have a python 3 version of houdini installed?"):
-        print('Great!')
-    else:
-        print("please install a python 3 version of houdini 18.5.759 and then run this tool again!")
-        print('Thanks!')
-        sys.exit()
-
-
-def load_from_config():
-    from dotenv import load_dotenv
-    load_dotenv("./.config/config.env")
-
-def getHouRoot():
-    os = check_os()
-    #print(os)
-    path = hou_18_paths[os]
-    #print(path)
-    return path
-
-#endregion
-#region Houdini Terminal
-
-###################################################
-############## Get Houdini Terminal ###############
-###################################################
-
-
-
-
-# CMD prompt & BASH & CSH
-
-def source_houdini():
-    platform = check_os()
-    path = pathlib.Path(hou_18_paths[platform])
-    new_path = ''
-    if platform == 'win':
-        term = 'bin/hcmd.exe'
-        new_path = pathlib.Path(path) / term
-    elif platform == 'mac':
-        term = 'Utilities/Houdini Terminal 18.5.759'
-        new_path = pathlib.Path(path) / term
-    elif platform == 'linux':
-        term = 'houdini_setup'
-        new_path = pathlib.Path(path) / term
-    #print(new_path)
-    return new_path
-
-
-
-# Slurp contents of terminal setup
-
-
-#endregion
-#region Houdini final
-#####################################################
-################### Houdini Final ###################
-#####################################################
-
-def init_houdini():
-    # This variable is necessary on H19.0.455 due to Houdini bug
-    #compat = "export LD_PRELOAD=/lib/x86_64-linux-gnu/libc_malloc_debug.so.0 ; "
-    cmd = []
-    #cmd.append(compat)
-    cmd.append("export JOB=\"%s\" ; " % SHOT)
-    # Create env vars for project sub-directories
-    # for dir in DIRS:
-    #     cmd.append("export %s=\"%s/%s\" ; " % (dir,SHOT,dir))
-    return cmd
-
-##### HOUDINI MAIN #####
-def houdini_main():
-    #slurp_term()
-    # load_from_config()
-    pass
-
-#endregion
-#endregion
 #region WORK SETUP METHODS
 #region config files
 
@@ -439,7 +355,7 @@ def write_to_env_file():
 
     with fp.open("w",encoding="utf-8") as f:
         for key, value in path_d.items():
-            f.write('%s="%s:&"\n' % (key, value))
+            f.write('%s="%s"\n' % (key, value))
 
 
 def write_to_json():
@@ -520,10 +436,54 @@ def is_file_empty(file_name) -> bool:
         if not one_char:
             return True
     return False
-#endregion
 
 #endregion
+#endregion
 #region Check 3rd party software
+#region Redshift setup
+
+redshift_paths = {
+    'windows':'C:/ProgramData/Redshift/bin',
+    'mac':'/Applications/redshift/redshift4houdini/',
+    'linux':'/usr/redshift/bin',
+}
+
+redshift_vars = {
+    'HOUDINI_DSO_ERROR':2
+}
+
+def redshift_setup():
+    platform = check_os()
+    add_var_to_dict('HOUDINI_DSO_ERROR',str(2))
+    rs_key = 'RS_PATH'
+    add_var_to_dict(rs_key,redshift_paths[platform])
+    rs_path = pathlib.Path(redshift_paths[platform])
+    add_var_to_dict('USE_RS',str(1))
+    return rs_path
+
+
+def redshift_main():
+    if(y_n_q('Is this project using Redshift?')):
+        if(y_n_q('Do you have Redshift installed?')):
+            rs_path = redshift_setup()
+            try:
+                if(rs_path.is_dir()):
+                    redshift_setup()
+                else:
+                    FileNotFoundError
+            except FileNotFoundError:
+                print('Redshift installation not found... please check your install and try again')
+                quit()
+        else:
+            print('please install redshift and try again...')
+            quit()
+    else:
+        add_var_to_dict('USE_RS',str(0))
+        print('Your config will be set to not use redshift... \n if you want to change this, initialize the project again...')
+
+
+
+#endregion
 #region 3DELIGHT setup
 
 def delight_setup():
@@ -792,6 +752,8 @@ shot_subdir_names = [
     "PRE_PRODUCTION",
     "FINAL",
     'SCRIPTS',
+    "CLIPS",
+    "VEX",
     "OTHER",
 ]
 
@@ -862,9 +824,9 @@ def create_shot():
         
         add_to_dict_and_arr('SHOT_ROOT',first_shot_n)
         
-        shot_env_var_init(first_shot_n)
+        #shot_env_var_init(first_shot_n,shot_subfolders)
         print(f"\'{first_shot_n}\' created along with resource dirs.")
-        return shot_subfolders
+        return shot_subfolders, first_shot_n
     #case 2 - creating any subsequent shot directory
     else:
         shot_n = first_shot_n
@@ -887,12 +849,17 @@ def create_shot():
         shot_subfolders = create_shot_subfolders(shot_n)
         
         add_to_dict_and_arr('SHOT_ROOT',shot_n)
+
         
-        shot_env_var_init(shot_n)
-        
+
+        # if y_n_q("would you like to open newly created shot?"):
+        #     open_shot(shot_n)
+        # else:
+        #     shotlist = subdir_list(top_level_shot)
+        #     print(shotlist)
         
         print(f"\'{shot_n}\' created along with resource dirs.")
-        return shot_subfolders
+        return shot_subfolders, shot_n
 
 def create_shot_subfolders(rootdir):
     dirlist = create_dirs_from_list(rootdir,shot_subdir_names)
@@ -901,7 +868,7 @@ def create_shot_subfolders(rootdir):
     subsubresdict = {
         'SRC':global_src_dir_namelist,
         'GEO':global_geo_dir_namelist,
-        'TEXTURE':global_tex_dir_namelist
+        'TEXTURE':global_tex_dir_namelist,
     }
 
     specresdict={}
@@ -1015,9 +982,6 @@ def subdir_list(path):
             sorted_shots.append(np)
     return sorted_shots
 
-
-
-
 def choose_shot(pathlist):
     '''
     displays number of choices user and input
@@ -1096,6 +1060,7 @@ def shot_decision():
     shot_root = ''
     shot_choice = ''
     User_not_confirm = True
+    shot_chosen = False
     while User_not_confirm:
         try:
             user_choice = int(input(
@@ -1109,23 +1074,32 @@ def shot_decision():
                 print('creating new shot....')
 
                 shot_folders = create_shot()
-                shotlist = subdir_list(shots_root)
-                while True:
-                    try:
-                        shot_choice = choose_shot(shotlist)
-                        if (shot_choice[1] == False):
+                if y_n_q("Would you like to open newly created shot?"):
+                    newshot = shot_folders[1]
+                    newshotnum = int(newshot.name.split('_')[1])
+                    print(newshotnum)
+                    shot_choice_path = newshot
+                    shot_chosen = True
+                    break
+                else:
+                    
+                    shotlist = subdir_list(shots_root)
+                    while True:
+                        try:
+                            shot_choice = choose_shot(shotlist)
+                            if (shot_choice[1] == False):
+                                continue
+                            elif (shot_choice[1] == True):
+                                print(f'shot choice:: {shot_choice[0]} ---')
+                                shot_choice_path = shotlist[shot_choice[0]-1]
+                                User_not_confirm = False
+                                break
+                            else:
+                                raise ValueError
+                        except ValueError:
                             continue
-                        elif (shot_choice[1] == True):
-                            print(f'shot choice:: {shot_choice[0]} ---')
-                            shot_choice_path = shotlist[shot_choice[0]-1]
-                            User_not_confirm = False
-                            break
-                        else:
-                            raise ValueError
-                    except ValueError:
-                        continue
-                    # select shot
-                    # then houdini stuff
+                        # select shot
+                        # then houdini stuff
             # case 2
             elif user_choice == 2:
                 '''
@@ -1167,43 +1141,318 @@ def shot_decision():
         except ValueError:
             print('Please enter the numbers 1 or 2...')
             continue
+    
     open_shot(shot_choice_path)
 
 def open_shot(path):
     '''
     after user has confirmed shot folder do this...
     '''
-    subdirlist = []
-    print(path)
+    env_dict['SHOT_ROOT']=path
+    reslist = []
+    #print(path)
     subdir_list = get_resource_paths(path)
     for i in subdir_list:
+        reslist.append(i)
         print(f'+------------------Registering directory {i.name} in {path.name} directory for your session...')
     print(f'!!! ----- Here is a reminder of the subdirectories in your resources folder ----- !!!')
-    for i in subdir_list:
+    
+    add_dirlist_to_dict(reslist,'')
+    
+    for i in reslist:
         
         sublist = []
+        print(i.name)
         for k in i.iterdir():
             if k.is_dir():
-                print(f'{k.name}')
+                print(f'...........{k.name}')
                 sublist.append(k)
-
-    # for p in Path(path).iterdir():
-    #     if p.is_dir():
-
-    #print(subdirlist)
-
-def shot_env_var_init(shot_root):
-    add_readme_file_to_dir(shot_root)
-    shot_resource_list = get_resource_paths(shot_root)
     
-    shot_dict = add_dirlist_to_return_dict(shot_resource_list)
-    #print(f'Shot dict:::: {shot_dict}')
+    
+    # shot_env_dict(path,subdir_list)
+    #shot_env_var_init(path,reslist)
 
+#region Houdini file
+
+hip_file_ext = [
+    'hip',
+    'hipnc',
+    'hiplc',
+]
+
+
+def list_proj_files(directory):
+    p = directory
+    file_list = []
+    choice_list = []
+    # for f in os.listdir(p):
+    #     print(f)
+    try:
+        for f in os.listdir(p):
+            if not f.startswith('.'):
+                
+                file_list.append(f)
+    except FileNotFoundError: 
+        print('No hip files found')
+    
+    for i in range(len(file_list)):
+        print(f'{i+1}:: {file_list[i]}')
+        choice_list.append(i+1)
+    print(choice_list)
+    return file_list           
+
+def choose_file(flist):
+    '''
+    displays number of choices user and input
+    '''
+    choices = []
+    choice = ''
+    for i in range(len(flist)):
+        print(f'{i+1} = {flist[i]}')
+        choices.append(i+1)
+    print(f'Choices:: {choices}')
+    choice = user_choose_file(choices)
+    return choice
+
+def user_choose_file(choices):
+    inner_confirm = True
+    confirm = False
+    choice = 0
+    while True:
+        try:
+            user_choice = int(input('Please select a corresponding number for the file you wish to open: ').lower())
+            #print(proj_list[user_choice])
+            result = check_if_num_in_list(user_choice,choices)
+            if(result == True):
+                print(f'You chose: {choices[user_choice-1]}')
+                while inner_confirm:
+                    try:
+                        #accepted_input = ['y','n']
+                        user_confirm = input(
+                            'Is this correct? y/n: '
+                        ).lower()
+                        if (user_confirm == 'y' or 'n'):
+                            if(user_confirm == 'y'):
+                                confirm = True
+                                inner_confirm = False
+                            elif(user_confirm == 'n'):
+                                confirm = False
+                                inner_confirm = False
+                            else:
+                                print('Invalid response, try again...')
+                                raise ValueError                          
+                        else:
+                            raise ValueError
+                    except ValueError:
+                        print('Invalid response, try again...')
+                        continue
+                if(confirm == True):
+                    break
+                elif(confirm == False):
+                    break
+            else:
+                print('Invalid response, try again...')
+                continue
+        except ValueError:
+            print('Invalid response, try again...')
+            continue
+    return choice, confirm
+
+
+def houdini_file_main():
+    hip_root = pathlib.Path(env_dict['HIP'])
+    proj_list = list_proj_files(hip_root)
+
+    if not (len(proj_list) == 0):
+        print(proj_list)
+        if(y_n_q('Do you want to open an existing file?')):
+            choice = choose_file(proj_list)
+            add_var_to_dict('OPEN_FILE',1)
+            #print(choice)
+            file_choice = proj_list[choice[0]]
+            print(f'You chose {file_choice} to open....')
+            add_var_to_dict('FILE_TO_OPEN',file_choice)
+            #choice = choose_file()
+        else:
+                add_var_to_dict('OPEN_FILE',0)
+                print('Create a new file after Houdini launches...')
+                add_var_to_dict('FILE_TO_OPEN','')
+                input('Press Enter to continue....')
+    else:
+        print('There are no project files in HIP directory, create one after houdini launches... \n')
+        add_var_to_dict('OPEN_FILE',0)
+        add_var_to_dict('FILE_TO_OPEN','')
+        input('Press Enter to continue....')
+
+
+
+#endregion
+#region Hou shot env setup
+def shot_env_var_init(shot_path,shot_dirlist):
+    # add_readme_file_to_dir(shot_root)
+    # shot_resource_list = get_resource_paths(shot_root)
+    # for i in shot_dirlist:
+    #     shot_env_dict[i.name]=i
+    # pprint(shot_env_dict)
+    add_dirlist_to_dict(shot_dirlist,'')
+    #shot_dict = add_dirlist_to_return_dict(shot_resource_list)
+    #print(f'Shot dict:::: {shot_dict}')
+    # configure hou vars from existing paths
+    # packages
+    # HDAs
+    # vars HSITE, HOUDINI_PACKAGE_DIR, JOB, HIP, HOUDINI_OTL_SCAN_PATH, HOUDINI_NO_ENV_FILE
+    #print(shot_path)
+    add_var_to_dict('SHOT_NAME',shot_path.name)
+    #add_var_to_dict('HOUDINI_NO_ENV_FILE',True)
+    add_var_to_dict('HSITE',env_dict['HSITE'])
+    add_var_to_dict('HOUDINI_PACKAGE_DIR',env_dict['PACKAGES'])
+    add_var_to_dict('JOB',shot_path)
+    #hda_paths = env_dict['G_HDA']+':'+env_dict['HDA']
+    hda_paths = str(f'{env_dict["G_HDA"]};{env_dict["HDA"]}')
+    add_var_to_dict('HOUDINI_OTLSCAN_PATH',hda_paths)
+    add_var_to_dict('HOUDINI_SCRIPT_PATH',env_dict['SCRIPTS'])
+    add_var_to_dict('HOUDINI_TEXTURE_PATH',env_dict['TEXTURE'])
+    add_var_to_dict('HOUDINI_GEOMETRY_PATH',env_dict['GEO'])
+    add_var_to_dict('HOUDINI_CLIP_PATH',env_dict['CLIPS'])
+    add_var_to_dict('HOUDINI_VEX_PATH',env_dict['VEX'])
+    #print(hda_paths)
+    #add_var_to_dict('HIP',shot_env_dict['HIP'])
+
+    # aces stuff
 
 
     # resource_paths = [i[0] for i in os.walk(
     #     curr_path) if pathlib.Path.name(str(i[0])) in shot_subdir_names]
     # return resource_paths
+    # List hip files
+    # open hip files
+
+#endregion
+#endregion
+#endregion
+#endregion
+#region HOUDINI 
+##############################
+####### Houdini Stuff ########
+##############################
+#region HOUDINI setup
+
+def indie_check():
+    '''Check if user has the correct houdini installed'''
+    if y_n_q("Do you have houdini indie?"):
+        print('Great!')
+    else:
+        print("You will need to convert your hdas and project files to indie using you're project leads account on orbolt before you push changes!")
+        print("please check the docs for link to the converter!")
+    if y_n_q("Do you have a python 3 version of houdini installed?"):
+        print('Great!')
+    else:
+        print("please install a python 3 version of houdini 18.5.759 and then run this tool again!")
+        print('Thanks!')
+        sys.exit()
+
+
+def load_from_config():
+    from dotenv import load_dotenv
+    load_dotenv("./.config/config.env")
+
+def getHouRoot():
+    os = check_os()
+    #print(os)
+    path = hou_18_paths[os]
+    #print(path)
+    return path
+
+#endregion
+
+#region HOUDINI shell
+# CMD prompt & BASH & CSH
+
+###################################################
+############## Get Houdini Terminal ###############
+###################################################
+
+def source_houdini():
+    platform = check_os()
+    path = pathlib.Path(hou_18_paths[platform])
+    new_path = ''
+    if platform == 'win':
+        term = 'bin/hcmd.exe'
+        new_path = pathlib.Path(path) / term
+    elif platform == 'mac':
+        term = 'Utilities/Houdini Terminal 18.5.759'
+        new_path = pathlib.Path(path) / term
+    elif platform == 'linux':
+        term = 'houdini_setup'
+        new_path = pathlib.Path(path) / term
+    #print(new_path)
+    return new_path
+
+#region Houdini final
+#####################################################
+################### Houdini Final ###################
+#####################################################
+
+def set_env_vars(dictionary):
+    for k,v in dictionary.items():
+        prog = re.compile('[^&+]')
+        #new_v = re.match(r"[^&+]",v)
+        v_len = len(v)
+        #new_v = str.rstrip(v[-1])
+        new_v = re.sub(r"[:&+]",'', v)
+        #print(k,new_v)
+        os.environ[k]=new_v
+
+def env_from_file():
+    env_file = pathlib.Path(env_dict['CONFIG'])/'config.env'
+
+    env_dict_file = dotenv.dotenv_values(env_file)
+    set_env_vars(env_dict_file)
+
+def init_houdini():
+    # This variable is necessary on H19.0.455 due to Houdini bug
+    #compat = "export LD_PRELOAD=/lib/x86_64-linux-gnu/libc_malloc_debug.so.0 ; "
+    cmd = []
+    #cmd.append(compat)
+    cmd.append("export JOB=\"%s\" ; " % SHOT)
+    # Create env vars for project sub-directories
+    # for dir in DIRS:
+    #     cmd.append("export %s=\"%s/%s\" ; " % (dir,SHOT,dir))
+    return cmd
+
+##### HOUDINI MAIN #####
+def houdini_main():
+    #env_from_file()
+    #print(f'env: {os.environ["HOUDINI_TERM"]}')
+    env_file = pathlib.Path(env_dict['CONFIG'])/'config.env'
+    #slurp_term()
+    # load_from_config()
+    cmd = []
+    hou_setup = env_dict['HOUDINI_TERM']
+    #local_os = check_os()
+    if (env_dict['OS'] == 'win'):
+        import houdini_setup_windows
+    elif (env_dict['OS'] == 'mac'):
+        import houdini_setup_mac
+    elif (env_dict['OS'] == 'linux'):
+        os.environ['HOU_ROOT']=str(env_dict['HOU_ROOT'])
+        import houdini_setup_linux
+    else:
+        pass
+
+
+def hou_linux_setup():
+    pass
+
+@contextlib.contextmanager
+def working_directory(path):
+    prev_cwd = pathlib.Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)
+
 #endregion
 #endregion
 #endregion
@@ -1211,7 +1460,7 @@ def shot_env_var_init(shot_root):
 #region Pre Production Setup
 
 pre_prod_dir_names = {
-    'Storyboards'
+    'Storyboards',
     'Animatics',
     'Color_Scripts',
 }
@@ -1228,7 +1477,22 @@ def init_pre_production(path):
     pre_sub_list = create_dirs_from_list(pre_pro_root,pre_prod_dir_names)
     add_files_to_empty_folders(pre_sub_list)
 
+#endregion
+#region HSITE setup
 
+hsite_names = [
+    'houdini18',
+    'houdini19',
+]
+
+def hsite_setup():
+    hsite_root = pathlib.Path(REPO_ROOT)/'hsite'
+    create_dir_if_not_present(hsite_root)
+    add_readme_file_to_dir(hsite_root)
+    add_to_dict_and_arr('HSITE',hsite_root)
+    hsite_185 = pathlib.Path(hsite_root)/'houdini18.5'
+    create_dir_if_not_present(hsite_185)
+    add_to_dict_and_arr('HSITE_185',hsite_185)
 
 #endregion
 #region Post Production Setup
@@ -1297,9 +1561,6 @@ def init_post_production():
     #full_dirlist = dir
     add_files_to_empty_folders(g_post_subdirlist)
 
-
-
-
 def init_asset_post_production(path):
     post_prod_path = path
     # ++++++++++
@@ -1358,7 +1619,26 @@ def init_asset_post_production(path):
 
 #endregion
 #region Initialize
+#region CLI stuff
+switches = [
+    '-h',
+    '--help',
+]
 
+args_kwargs = [
+    '--setup',
+    '--open-shot',
+    '--new-shot',
+    '--info',
+]
+
+def cli_check(switches,args_kwargs):
+    #print(switches)
+    args_kwargs.pop(0)
+    #print(args_kwargs)
+    
+
+#endregion
 ##############################################
 ############## Get Initialized ###############
 ##############################################
@@ -1368,6 +1648,9 @@ def get_initial_paths():
     new_folders = []
     # config stuff
     CONFIG = create_config_dir()
+
+    # HSITE stuff
+    hsite_setup()
 
     #region logging setup
     #TODO implement log file
@@ -1468,7 +1751,7 @@ def get_initial_paths():
     PACKAGES = pathlib.Path(PROJECT_ROOT,"packages")
     create_dir_if_not_present(PACKAGES)
     add_readme_file_to_dir(PACKAGES)
-    add_to_dict_and_arr("HOUDINI_PACKAGE_DIR",PACKAGES)
+    add_to_dict_and_arr("PACKAGES",PACKAGES)
 
     # SHOT ROOT
     SHOTS_ROOT = pathlib.Path(PROJECT_ROOT,"Shots")
@@ -1483,19 +1766,85 @@ def get_initial_paths():
     #createShotDir(SHOTS_ROOT)
 
     add_to_dict_and_arr('INITIALIZED','TRUE')
+
 #endregion
 #endregion
 #region EXECUTE
 
-def main():
-    indie_check()
-    get_initial_paths()
+def parse_dotenv(dotenv_path): 
+    with open(dotenv_path) as f: 
+        for line in f: 
+            line = line.strip() 
+            if not line or line.startswith('#') or '=' not in line: 
+                continue 
+            k, v = line.split('=', 1) 
 
-    # Shot stuff
-    shot_decision()
-    #houdini setup
-    create_config_files()
-    houdini_main()
+            # Remove any leading and trailing spaces in key, value 
+            k, v = k.strip(), v.strip().encode('unicode-escape').decode('ascii') 
+
+            if len(v) > 0: 
+                quoted = v[0] == v[len(v) - 1] in ['"', "'"] 
+
+                if quoted: 
+                    v = decode_escaped(v[1:-1]) 
+
+            yield k, v
+
+def check_init(env_path) -> bool:
+    
+    result = False
+    config = ''
+    if(env_path.is_file()):
+        config = dotenv_values(env_path)
+        env_dict = config
+        pprint(config)
+        result = True
+    else:
+        result = False
+    return result
+
+def main():
+    env_path = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'
+    # CLI stuff
+    switches = [i for i in sys.argv if re.match(r'^-[A-Za-z]+$',i)]
+    args_kwargs = [i for i in sys.argv if not re.match(r'^-[A-Za-z]+$', i)]
+    cli_check(switches,args_kwargs)
+
+    if not (check_init(env_path)):
+
+        # 3rd party software
+        indie_check()
+        redshift_main()
+
+        # initialize
+        get_initial_paths()
+
+        # Shot stuff
+        shot_decision()
+
+        #houdini setup
+        houdini_file_main()
+
+        # config files
+        create_config_files()
+
+        # open houdini
+        houdini_main()
+
+    else:
+        
+
+        # Shot stuff
+        shot_decision()
+
+        #houdini setup
+        houdini_file_main()
+
+        # config files
+        create_config_files()
+
+        # open houdini
+        houdini_main()
 
 
 if __name__ == "__main__":

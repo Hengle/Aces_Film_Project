@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{e1f0542d-9594-432d-8b78-19d500fa3786}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>
+    </StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <Name>HoudiniExprEditor</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="D:\__dev__\HoudiniPythonTools\HoudiniExprEditor\scripts\python\HoudiniExprEditor\" />
+    <Folder Include="scripts\" />
+    <Folder Include="scripts\python\" />
+    <Folder Include="scripts\python\HoudiniExprEditor\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="scripts\python\HoudiniExprEditor\ParmWatcher.py" />
+    <Compile Include="scripts\python\HoudiniExprEditor\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="build_infos.txt" />
+    <Content Include="MainMenuCommon.xml" />
+    <Content Include="OPmenu.xml" />
+    <Content Include="PARMmenu.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
