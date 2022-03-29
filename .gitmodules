@@ -1,25 +1,24 @@
 [submodule "Houdini_Personal_Resources"]
 	path = Houdini_Personal_Resources
-	url = git@github.com:benshurts/Houdini_Personal_Resources.git
+	url = https://github.com/benshurts/Houdini_Personal_Resources.git
 [submodule "Main_Project/packages/qLib"]
 	path = Main_Project/packages/qLib
-	url = git@github.com:qLab/qLib.git
+	url = https://github.com/qLab/qLib.git
 [submodule "Main_Project/packages/MOPS"]
 	path = Main_Project/packages/MOPS
-	url = git@github.com:toadstorm/MOPS.git
+	url = https://github.com/toadstorm/MOPS.git
 [submodule "Main_Project/packages/SideFXLabs"]
 	path = Main_Project/packages/SideFXLabs
-	url = git@github.com:sideeffects/SideFXLabs.git
+	url = https://github.com/sideeffects/SideFXLabs.git
 [submodule "Main_Project/packages/houdini_bookmarks"]
 	path = Main_Project/packages/houdini_bookmarks
-	url = git@github.com:Houdini-Packages/houdini_bookmarks.git
+	url = https://github.com/gorrod/houdini_bookmarks.git
 [submodule "Main_Project/packages/Aelib"]
 	path = Main_Project/packages/Aelib
-	url = git@github.com:Houdini-Packages/Aelib.git
+	url = https://github.com/Aeoll/Aelib.git
 [submodule "Main_Project/packages/HMT"]
 	path = Main_Project/packages/HMT
-	url = git@github.com:Houdini-Packages/HMT.git
-
+	url = https://github.com/andrew-lowell/HMT.git
 [submodule "Main_Project/packages/DMNK-Tools"]
 	path = Main_Project/packages/DMNK-Tools
-	url = git@github.com:Houdini-Packages/DMNK-Tools.git
+	url = https://github.com/DominikLingenover/DMNK-Tools.git

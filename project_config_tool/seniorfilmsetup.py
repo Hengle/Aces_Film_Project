@@ -4,22 +4,23 @@
 
 import contextlib
 from importlib.resources import path
-#from lzma import _PathOrFile
-from operator import add
+# from importlib.resources import path
+# from lzma import _PathOrFile
+# from operator import add
 import os
 import pathlib
 import string
-import subprocess
+# import subprocess
 import argparse
 import fnmatch
 import glob
 import sys
 import json
 import dotenv
-import yaml
+#import yaml
 import re
-import logging
-import shlex
+# import logging
+# import shlex
 import argparse
 
 #########################################
@@ -333,9 +334,9 @@ def convert_env_dict_to_string():
     return(new_d)
 
 
-def convert_env_dict_to_path():
+def convert_env_dict_to_path(env_d):
     new_d = {}
-    for k, v in env_dict.items():
+    for k, v in env_d.items():
 
         if isinstance(v, str):
 
@@ -348,10 +349,10 @@ def convert_env_dict_to_path():
 
     return new_d
 
-def write_to_env_file():
+def write_to_env_file(env_d):
     new_d = convert_env_dict_to_string()
-    path_d = convert_env_dict_to_path()
-
+    path_d = convert_env_dict_to_path(env_d)
+    pprint(path_d)
     fp = Path(path_d["CONFIG"]) / "config.env"
 
     with fp.open("w",encoding="utf-8") as f:
@@ -361,7 +362,7 @@ def write_to_env_file():
 
 def write_to_json():
     path_d = convert_env_dict_to_path()
-    string_d = convert_env_dict_to_string()
+    string_d = convert_env_dict_to_string(env_dict)
     fp = Path(path_d["CONFIG"]) / "config.json"
 
     with fp.open("w") as f:
@@ -370,10 +371,10 @@ def write_to_json():
 
 #region Config setup
 
-def create_config_files():
+def create_config_files(env_d):
     path = CONFIG
     print(path)
-    write_to_env_file()
+    write_to_env_file(env_d)
     #write_to_json()
 
 #endregion
@@ -1381,7 +1382,7 @@ def source_houdini():
         term = 'bin/hcmd.exe'
         new_path = pathlib.Path(path) / term
     elif platform == 'mac':
-        term = 'Utilities/Houdini Terminal 18.5.759'
+        term = 'Frameworks/Houdini.framework/Versions/Current/Resources/houdini_setup'
         new_path = pathlib.Path(path) / term
     elif platform == 'linux':
         term = 'houdini_setup'
@@ -1437,6 +1438,7 @@ def houdini_main():
         import houdini_setup_mac
     elif (env_dict['OS'] == 'linux'):
         os.environ['HOU_ROOT']=str(env_dict['HOU_ROOT'])
+        print(os.environ['HOU_ROOT'])
         import houdini_setup_linux
     else:
         pass
@@ -1772,24 +1774,24 @@ def get_initial_paths():
 #endregion
 #region EXECUTE
 
-def parse_dotenv(dotenv_path): 
-    with open(dotenv_path) as f: 
-        for line in f: 
-            line = line.strip() 
-            if not line or line.startswith('#') or '=' not in line: 
-                continue 
-            k, v = line.split('=', 1) 
+# def parse_dotenv(dotenv_path): 
+#     with open(dotenv_path) as f: 
+#         for line in f: 
+#             line = line.strip() 
+#             if not line or line.startswith('#') or '=' not in line: 
+#                 continue 
+#             k, v = line.split('=', 1) 
 
-            # Remove any leading and trailing spaces in key, value 
-            k, v = k.strip(), v.strip().encode('unicode-escape').decode('ascii') 
+#             # Remove any leading and trailing spaces in key, value 
+#             k, v = k.strip(), v.strip().encode('unicode-escape').decode('ascii') 
 
-            if len(v) > 0:
-                quoted = v[0] == v[len(v) - 1] in ['"', "'"] 
+#             if len(v) > 0:
+#                 quoted = v[0] == v[len(v) - 1] in ['"', "'"] 
 
-                if quoted: 
-                    v = decode_escaped(v[1:-1]) 
+#                 if quoted: 
+#                     v = decode_escaped(v[1:-1]) 
 
-            yield k, v
+#             yield k, v
 
 def env_from_file(path):
     #env_file = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'
@@ -1848,7 +1850,10 @@ def unpack_dotenv(env_d):
     result = flatdict.FlatDict(env_d,delimiter=':')
     return result
 
-
+def add_dict_to_dict(sd,td):
+    for k, v in sd.items():
+        print(k)
+        td[k]=v
 
 # create parser
 parser = argparse.ArgumentParser()
@@ -1863,6 +1868,9 @@ args = parser.parse_args()
 
 
 def main():
+    
+    print(f'root dir:: {pathlib.Path.root}')
+    global env_dict
     env_path = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'
     # CLI stuff
     switches = [i for i in sys.argv if re.match(r'^-[A-Za-z]+$',i)]
@@ -1882,7 +1890,8 @@ def main():
         #houdini setup
         houdini_file_main()
         # config files
-        create_config_files()
+        
+        create_config_files(env_dict)
         # open houdini
         houdini_main()
     elif args.init == 'init-only':
@@ -1897,7 +1906,7 @@ def main():
         #houdini setup
         houdini_file_main()
         # config files
-        create_config_files()
+        create_config_files(env_dict)
 
     elif args.init == 'load-last':
         print('Loading last opened file')
@@ -1906,17 +1915,17 @@ def main():
         #result = depth(env_vars,1)
         #TODO use flatdict in houdini setup
         result = dict(unpack_dotenv(env_vars))
-        env_dict = result
+        
+        add_dict_to_dict(result,env_dict)
         
         pprint(result)
         houdini_main()
     elif args.init == 'man':
         
-        from rich.console import Console
-        from rich.markdown import Markdown
+        # from rich.console import Console
+        # from rich.markdown import Markdown
         # print('man page')
         f = pathlib.Path(pathlib.Path.cwd())/'project_config_tool/man.md'
-        md = Markdown(str(f))
         with open(str(f), "r+") as help_file:
             #Console.print(help_file,soft_wrap=True)
             contents = help_file.read()
@@ -1940,18 +1949,28 @@ def main():
             #houdini setup
             houdini_file_main()
             # config files
-            create_config_files()
+            create_config_files(env_dict)
             # open houdini
             houdini_main()
 
         else:
             
+            env_vars = env_from_file(env_path)
+            #result = [list(unpack(x)) for x in env_vars]
+            #result = depth(env_vars,1)
+            #TODO use flatdict in houdini setup
+            dotenvdict = dict(unpack_dotenv(env_vars))
+            
+            add_dict_to_dict(dotenvdict,env_dict)
+            
+            pprint(env_dict)
+
             # Shot stuff
             shot_decision()
             #houdini setup
             houdini_file_main()
             # config files
-            create_config_files()
+            create_config_files(env_dict)
             # open houdini
             houdini_main()
 

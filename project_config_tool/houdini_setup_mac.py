@@ -40,9 +40,20 @@ def rs_setup(env_path):
 
 
 def main():
-    os.chdir(os.environ['HOU_ROOT'])
+    app_dir = '/Applications/Houdini/Houdini18.5.759/Frameworks/Houdini.framework/Versions/18.5/Resources'
+    env_d = hs.env_from_file(env_file)
+    dotenvdict = dict(hs.unpack_dotenv(env_d))
+    os.environ['HOU_ROOT']=dotenvdict['HOU_ROOT']
+    print(os.environ['HOU_ROOT'])
+    print(pathlib.Path.cwd())
+    # newpath = pathlib.Path(pathlib.Path.root()) / str(os.environ['HOU_ROOT']+'/Frameworks/Houdini.framework/Versions/Current/Resources')
+    # fullpath = newpath.resolve()
+    # print(fullpath)
+    os.chdir(app_dir)
     rs_setup(env_file)
-    env_dict = hs.env_from_file(env_file)
+    
+    envfile_d = hs.env_from_file(env_file)
+    env_dict = hs.unpack_dotenv(envfile_d)
     print(f'Directory changed to --> {pathlib.Path.cwd()}')
     from houdini_setup_shared import key_list
     new_dict = hs.seek_keys(env_dict,key_list)
@@ -53,7 +64,7 @@ def main():
         file_path = str(new_dict['HIP']+'/'+new_dict['FILE_TO_OPEN'])
         cmd = cmd+str('&& houdini '+file_path)
     else:
-        cmd = cmd+str(' && hconfig && houdini')
+        cmd = cmd+str(' && hconfig -ap && houdini')
     os.system(cmd)
 
 
