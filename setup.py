@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-from project_config_tool import seniorfilmsetup
+from project_config_tool import main
 
 def main():
-    seniorfilmsetup.main()
+    main.main()
 
 
 if __name__ == "__main__":

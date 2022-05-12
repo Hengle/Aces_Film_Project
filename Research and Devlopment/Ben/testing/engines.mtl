@@ -1,0 +1,32 @@
+# Blender MTL File: 'pship4.blend'
+# Material Count: 3
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl Trim1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd /mnt/MegaStomach1/CG/Asset Library/Textures/Sci-fi_trim_sheet_textures/Trimm4/Ambient Occlusion Map from Mesh DefaultMaterial.png
+
+newmtl metal1
+Ns 82.004112
+Ka 1.000000 1.000000 1.000000
+Kd 0.092708 0.092709 0.092726
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump -bm 0.200000 /home/ben/dev/Aces_Stuff/Aces_Film_Project/Research and Devlopment/Ben/JS-Classic-2022-01-31-09-03-29.png

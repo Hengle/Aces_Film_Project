@@ -4,7 +4,7 @@ import pathlib
 import re
 
 from pprint import pprint
-from dotenv import dotenv_values
+from lib.dotenv import dotenv_values
 import houdini_setup_shared as hs
 
 env_file = pathlib.Path(pathlib.Path.cwd())/'.config/config.env'

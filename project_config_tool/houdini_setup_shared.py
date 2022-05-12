@@ -1,7 +1,7 @@
 import os
 import pathlib
 import re
-from dotenv import dotenv_values
+from lib.dotenv import dotenv_values
 
 key_list = [
         'HSITE',
@@ -53,7 +53,7 @@ def seek_keys(d, key_list):
     return result
 
 def unpack_dotenv(env_d):
-    import flatdict
+    import lib.flatdict as flatdict
     result = flatdict.FlatDict(env_d,delimiter=':')
     return result
 
